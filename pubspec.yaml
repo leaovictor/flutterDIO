@@ -1,0 +1,25 @@
+name: todo_app
+description: Um aplicativo To-Do simples em Flutter.
+
+flutter:
+  uses-material-design: true
+
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.17.0
+
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png" # Substitua pelo seu próprio ícone
+
+environment:
+  sdk: ">=2.12.0 <4.0.0"
