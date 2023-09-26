@@ -2,7 +2,7 @@
 
 Este é um aplicativo simples de lista de tarefas construído em Flutter que permite aos usuários gerenciar suas tarefas pendentes e concluídas. Ele oferece recursos como adicionar, editar, excluir tarefas e visualizar o histórico de ações relacionadas às tarefas.
 
-![Captura de tela do aplicativo](screenshot.png)
+![Captura de tela do aplicativo](![Alt text](2023-09-26_14h40_45.png))
 
 ## Funcionalidades Principais
 
