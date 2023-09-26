@@ -9,8 +9,10 @@ class CompletedTask {
   String title;
   DateTime creationDate;
   DateTime completionDate;
+  List<String> actionLog; // Lista para armazenar o histórico de ações
 
-  CompletedTask(this.title, this.creationDate, this.completionDate);
+  CompletedTask(this.title, this.creationDate, this.completionDate)
+      : actionLog = []; // Inicialize a lista de ações vazia
 }
 
 class Task {
@@ -45,7 +47,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('To-Do List DIO'),
+        title: Text('To-Do List myprogrammer'),
       ),
       body: ListView.builder(
         itemCount: tasks.length + completedTasks.length,
@@ -58,7 +60,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Data de Inclusão: ${DateFormat.yMd().add_Hms().format(tasks[index].creationDate)}',
+                    'Data de Inclusão: ${DateFormat.yMd().add_Hms().format(tasks[index].creationDate)}' +
+                    (tasks[index].editDate != null
+                        ? '\nData de Edição: ${DateFormat.yMd().add_Hms().format(tasks[index].editDate!)}'
+                        : ''),
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
@@ -68,12 +73,17 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 onChanged: (bool? value) {
                   setState(() {
                     tasks[index].isCompleted = value!;
-                    if (value!) {
+                    if (value) {
                       // Mover tarefa concluída para a lista de tarefas concluídas
-                      completedTasks.add(CompletedTask(
+                      CompletedTask completedTask = CompletedTask(
                           tasks[index].title,
                           tasks[index].creationDate,
-                          DateTime.now()));
+                          DateTime.now());
+
+                      completedTask.actionLog.add(
+                          'Tarefa concluída em ${DateFormat.yMd().add_Hms().format(DateTime.now())}');
+
+                      completedTasks.add(completedTask);
                       tasks.removeAt(index);
                     }
                   });
@@ -91,9 +101,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
-                      setState(() {
-                        tasks.removeAt(index);
-                      });
+                      _confirmDeleteTask(context, index);
                     },
                   ),
                 ],
@@ -112,6 +120,15 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
+              ),
+              onTap: () {
+                _showActionLog(context, completedIndex);
+              },
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  _confirmDeleteCompletedTask(context, completedIndex);
+                },
               ),
             );
           }
@@ -212,6 +229,94 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   });
                   Navigator.of(context).pop();
                 }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showActionLog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Histórico de Ações'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Tarefa: ${completedTasks[index].title}'),
+                SizedBox(height: 8),
+                for (String action in completedTasks[index].actionLog)
+                  Text('- $action'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteTask(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Excluir Tarefa'),
+          content: Text('Tem certeza que deseja apagar esta tarefa?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Confirmar'),
+              onPressed: () {
+                setState(() {
+                  tasks.removeAt(index);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteCompletedTask(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Excluir Tarefa Concluída'),
+          content: Text('Tem certeza que deseja apagar esta tarefa concluída?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Confirmar'),
+              onPressed: () {
+                setState(() {
+                  completedTasks.removeAt(index);
+                });
+                Navigator.of(context).pop();
               },
             ),
           ],
